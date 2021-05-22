@@ -1,0 +1,35 @@
+#Author: Rudra Panda
+#Environment Info
+#A_IP='10.0.2.15', A_MAC='08:00:27:e9:cd:6b'
+#B_IP='10.0.2.4', B_MAC='08:00:27:af:c0:73'
+#M_IP='10.0.2.5', M_MAC='08:00:27:de:41:03'
+
+#Start over by flushing your rules (sudo iptables -F) and
+#write the rules on VM B to DROP all traffic except the following:
+#   VM B may initiate connections to any host
+#   VM B may not visit the website example.com
+#   VM B may allow incoming ping, SSH, and FTP from VM A only
+
+sudo iptables -F
+
+sudo iptables -P INPUT DROP
+sudo iptables -P FORWARD DROP
+sudo iptables -P OUTPUT ACCEPT
+
+sudo iptables -A OUTPUT -m conntrack --ctstate NEW -j ACCEPT
+sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+sudo iptables -A INPUT -i lo -j ACCEPT
+sudo iptables -A OUTPUT -o lo -j ACCEPT
+
+#   VM B may not visit the website example.com
+sudo iptables -I OUTPUT 1 -d www.example.com -j DROP
+
+# VM B may allow incoming ping, SSH, and FTP from VM A only
+sudo iptables -A INPUT -p ICMP -s 10.0.2.15 -j ACCEPT
+sudo iptables -A INPUT -p TCP --dport ssh -s 10.0.2.15 -j ACCEPT
+sudo iptables -A INPUT -p TCP --dport ftp -s 10.0.2.15 -j ACCEPT
+
+#output iptable rules
+sudo iptables -L -v
+

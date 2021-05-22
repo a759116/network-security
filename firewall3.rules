@@ -1,0 +1,21 @@
+#Author: Rudra Panda
+#Environment Info
+#A_IP='10.0.2.15', A_MAC='08:00:27:e9:cd:6b'
+#B_IP='10.0.2.4', B_MAC='08:00:27:af:c0:73'
+#M_IP='10.0.2.5', M_MAC='08:00:27:de:41:03'
+
+#Flush iptables
+sudo iptables -F
+#Default: DROP all traffic
+sudo iptables -P INPUT DROP
+sudo iptables -P OUTPUT DROP
+sudo iptables -P FORWARD DROP
+
+#write rules to allow VM B to initiate any outgoing connections and accept their return,
+#but not any incoming packets at all. Make the rule stateful.
+sudo iptables -A OUTPUT -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+#output iptable rules
+sudo iptables -L -v
+

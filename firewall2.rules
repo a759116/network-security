@@ -1,0 +1,23 @@
+#Author: Rudra Panda
+#Environment Info
+#A_IP='10.0.2.15', A_MAC='08:00:27:e9:cd:6b'
+#B_IP='10.0.2.4', B_MAC='08:00:27:af:c0:73'
+#M_IP='10.0.2.5', M_MAC='08:00:27:de:41:03'
+
+#Flush iptables
+sudo iptables -F
+#Default: DROP all traffic
+sudo iptables -P INPUT DROP
+sudo iptables -P OUTPUT DROP
+sudo iptables -P FORWARD DROP
+
+#Enable logging
+sudo iptables -A INPUT -j LOG --log-level 4
+
+#Write rules so that VM B would respond to a ping from VM A only
+sudo iptables -A INPUT -p ICMP -s 10.0.2.15 -j ACCEPT
+sudo iptables -A OUTPUT -p ICMP -d 10.0.2.15 -j ACCEPT
+
+#output iptable rules
+sudo iptables -L -v
+
